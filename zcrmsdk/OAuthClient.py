@@ -3,9 +3,11 @@ Created on Aug 16, 2017
 
 @author: sumanth-3058
 '''
-from OAuthUtility import OAuthLogger,ZohoOAuthConstants,ZohoOAuthException,ZohoOAuthHTTPConnector,ZohoOAuthParams
-from Persistence import ZohoOAuthPersistenceHandler,ZohoOAuthPersistenceFileHandler
+from .OAuthUtility import OAuthLogger,ZohoOAuthConstants,ZohoOAuthException,ZohoOAuthHTTPConnector,ZohoOAuthParams
+from .Persistence import ZohoOAuthPersistenceHandler,ZohoOAuthPersistenceFileHandler
 import logging
+
+
 class ZohoOAuth(object):
     '''
     This class is to load oauth configurations and provide OAuth request URIs
@@ -20,7 +22,7 @@ class ZohoOAuth(object):
     @staticmethod
     def initialize():
         try:
-            from Path import PathIdentifier
+            from .Path import PathIdentifier
             import os
 
             if os.environ.get('USE_ENV_FOR_ZOHO_CONFIG') == 'true':
