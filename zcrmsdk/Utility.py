@@ -178,13 +178,13 @@ class ZCRMConfigUtil(object):
         import os
 
         if os.environ.get('USE_ENV_FOR_ZOHO_CONFIG') == 'true':
-            zoho_config = dict(
-                apiBaseUrl=os.environ.get('ZOHO_API_BASE_URL'),
-                apiVersion=os.environ.get('ZOHO_API_VERSION'),
-                sandbox=os.environ.get('ZOHO_SANDBOX'),
-                applicationLogFilePath=os.environ.get('ZOHO_APPLICATION_LOG_FILE_PATH'),
-                currentUserEmail=os.environ.get('ZOHO_CURRENT_USER_EMAIL')
-            )
+            zoho_config = {
+                "apiBaseUrl": os.environ.get('ZOHO_API_BASE_URL'),
+                "apiVersion": os.environ.get('ZOHO_API_VERSION'),
+                "sandbox": os.environ.get('ZOHO_SANDBOX'),
+                "applicationLogFilePath": os.environ.get('ZOHO_APPLICATION_LOG_FILE_PATH'),
+                "currentUserEmail": os.environ.get('ZOHO_CURRENT_USER_EMAIL')
+            }
         else:
             from .Path import PathIdentifier
             resources_path = os.path.join(PathIdentifier.get_client_library_root(), 'resources',
