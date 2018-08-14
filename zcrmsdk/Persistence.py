@@ -4,26 +4,35 @@ Created on Aug 16, 2017
 @author: sumanth-3058
 '''
 from .OAuthUtility import OAuthLogger
-import mysql.connector
+import os
 
 
 class ZohoOAuthPersistenceHandler(object):
     '''
     This class deals with persistance of oauth related tokens
     '''
+    def __init__(self):
+        self.connector = os.environ["ZOHO_CONNECTOR"]
+        self.database = os.environ["ZOHO_DB"]
+        self.user = os.environ["ZOHO_USER"]
+        self.password = os.environ["ZOHO_PASSWORD"]
+        self.host = os.environ["ZOHO_HOST"]
+        self.port = os.environ["ZOHO_PORT"]
+        self.table = os.environ["ZOHO_TABLE"]
+
     def saveOAuthTokens(self,oAuthTokens):
         try:
             self.deleteOAuthTokens(oAuthTokens.userEmail)
             connection=self.getDBConnection()
             cursor=connection.cursor()
-            #sqlQuery="INSERT INTO oauthtokens(useridentifier,accesstoken,refreshtoken,expirytime) VALUES('"+oAuthTokens.userEmail+"','"+oAuthTokens.accessToken+"','"+oAuthTokens.refreshToken+"',"+oAuthTokens.expiryTime+")";
-            sqlQuery="INSERT INTO oauthtokens(useridentifier,accesstoken,refreshtoken,expirytime) VALUES(%s,%s,%s,%s)";
+            #sqlQuery="INSERT INTO "+self.table+"(useridentifier,accesstoken,refreshtoken,expirytime) VALUES('"+oAuthTokens.userEmail+"','"+oAuthTokens.accessToken+"','"+oAuthTokens.refreshToken+"',"+oAuthTokens.expiryTime+")";
+            sqlQuery="INSERT INTO "+self.table+"(useridentifier,accesstoken,refreshtoken,expirytime) VALUES(%s,%s,%s,%s)";
             data=(oAuthTokens.userEmail,oAuthTokens.accessToken,oAuthTokens.refreshToken,oAuthTokens.expiryTime)
             cursor.execute(sqlQuery,data)
             connection.commit()
         except Exception as ex:
             import logging
-            OAuthLogger.add_log("Exception occured while saving oauthtokens into DB ",logging.ERROR,ex)
+            OAuthLogger.add_log("Exception occured while saving "+self.table+" into DB ",logging.ERROR,ex)
             raise ex
         finally:
             cursor.close()
@@ -33,7 +42,7 @@ class ZohoOAuthPersistenceHandler(object):
         try:
             connection=self.getDBConnection()
             cursor=connection.cursor()
-            sqlQuery="SELECT useridentifier,accesstoken,refreshtoken,expirytime FROM oauthtokens where useridentifier='"+userEmail+"'"
+            sqlQuery="SELECT useridentifier,accesstoken,refreshtoken,expirytime FROM "+self.table+" where useridentifier='"+userEmail+"'"
             cursor.execute(sqlQuery)
             row_count=0
             for(useridentifier,accesstoken,refreshtoken,expirytime) in cursor:
@@ -44,7 +53,7 @@ class ZohoOAuthPersistenceHandler(object):
                 raise Exception('No rows found for the given user')
         except Exception as ex:
             import logging
-            OAuthLogger.add_log("Exception occured while fetching oauthtokens from DB ",logging.ERROR,ex)
+            OAuthLogger.add_log("Exception occured while fetching "+self.table+" from DB ",logging.ERROR,ex)
             raise ex
         finally:
             cursor.close()
@@ -53,19 +62,23 @@ class ZohoOAuthPersistenceHandler(object):
         try:
             connection=self.getDBConnection()
             cursor=connection.cursor()
-            sqlQuery="DELETE FROM oauthtokens where useridentifier=%s"
+            sqlQuery="DELETE FROM "+self.table+" where useridentifier=%s"
             cursor.execute(sqlQuery,(userEmail,))
             connection.commit()
         except Exception as ex:
             import logging
-            OAuthLogger.add_log("Exception occured while deleting oauthtokens from DB ",logging.ERROR,ex)
+            OAuthLogger.add_log("Exception occured while deleting "+self.table+" from DB ",logging.ERROR,ex)
             raise ex
         finally:
             cursor.close()
             connection.close()
             
     def getDBConnection(self):
-        connection=mysql.connector.connect(user='root', password='',host='127.0.0.1',database='zohooauth')
+        if self.connector == 'mysql':
+            import mysql.connector as connector
+        if self.connector == 'postgres':
+            import psycopg2 as connector
+        connection = connector.connect(user = self.user, password = self.password, host = self.host, database = self.database, port = self.port)
         return connection
     
     
@@ -90,7 +103,7 @@ class ZohoOAuthPersistenceFileHandler(object):
             
         except Exception as ex:
             import logging
-            OAuthLogger.add_log("Exception occured while saving oauthtokens into File ",logging.ERROR,ex)
+            OAuthLogger.add_log("Exception occured while saving "+self.table+" into File ",logging.ERROR,ex)
             raise ex
         
     def getOAuthTokens(self,userEmail):
@@ -115,7 +128,7 @@ class ZohoOAuthPersistenceFileHandler(object):
             return responseObj
         except Exception as ex:
             import logging
-            OAuthLogger.add_log("Exception occured while fetching oauthtokens from File ",logging.ERROR,ex)
+            OAuthLogger.add_log("Exception occured while fetching "+self.table+" from File ",logging.ERROR,ex)
             raise ex
             
     def deleteOAuthTokens(self,userEmail):
@@ -142,5 +155,5 @@ class ZohoOAuthPersistenceFileHandler(object):
             
         except Exception as ex:
             import logging
-            OAuthLogger.add_log("Exception occured while deleting oauthtokens from File ",logging.ERROR,ex)
+            OAuthLogger.add_log("Exception occured while deleting "+self.table+" from File ",logging.ERROR,ex)
             raise ex
