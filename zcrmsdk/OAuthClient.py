@@ -26,14 +26,14 @@ class ZohoOAuth(object):
             import os
 
             if os.environ.get('USE_ENV_FOR_ZOHO_CONFIG') == 'true':
-                zoho_oauth_config = dict(
-                    client_id=os.environ.get('ZOHO_OAUTH_CLIENT_ID'),
-                    client_secret=os.environ.get('ZOHO_OAUTH_SECRET'),
-                    redirect_uri=os.environ.get('ZOHO_OAUTH_REDIRECT_URI'),
-                    accounts_url=os.environ.get('ZOHO_OAUTH_ACCOUNTS_URL'),
-                    token_persistence_path=os.environ.get('ZOHO_OAUTH_TOKEN_PERSISTENCE_PATH'),
-                    access_type=os.environ.get('ZOHO_OAUTH_ACCESS_TYPE')
-                )
+                zoho_oauth_config = {
+                    "client_id": os.environ.get('ZOHO_OAUTH_CLIENT_ID'),
+                    "client_secret": os.environ.get('ZOHO_OAUTH_SECRET'),
+                    "redirect_uri": os.environ.get('ZOHO_OAUTH_REDIRECT_URI'),
+                    "accounts_url": os.environ.get('ZOHO_OAUTH_ACCOUNTS_URL'),
+                    "token_persistence_path": os.environ.get('ZOHO_OAUTH_TOKEN_PERSISTENCE_PATH'),
+                    "access_type": os.environ.get('ZOHO_OAUTH_ACCESS_TYPE')
+                }
             else:
                 resources_path = os.path.join(PathIdentifier.get_client_library_root(), 'resources',
                                               'oauth_configuration.properties')
